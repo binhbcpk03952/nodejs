@@ -1,0 +1,19 @@
+{
+  "name": "nui-xanh-badminton-backend",
+  "version": "1.0.0",
+  "description": "Backend API Server cho Núi Xanh Badminton",
+  "main": "sever.js",
+  "scripts": {
+    "start": "node sever.js",
+    "dev": "node sever.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "mysql": "^2.18.1",
+    "node-cache": "^5.1.2",
+    "sharp": "^0.34.5"
+  }
+}

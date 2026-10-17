@@ -1,0 +1,20 @@
+.table,
+.table th,
+.table td {
+    text-align: center;
+}
+
+.table td.img_info {
+    text-align: left;
+}
+
+.table th,
+.table td {
+    /* Căn giữa nội dung bên trong ô theo chiều dọc */
+    vertical-align: middle;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
