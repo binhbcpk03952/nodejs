@@ -86,7 +86,7 @@ JWT_SECRET=your_super_secret_jwt_key_badminton_2026
 
 ### Bước 3: Khởi tạo Cơ sở dữ liệu (Database)
 
-Dự án đã được đóng gói sẵn **Docker Compose** bao gồm **MySQL 8.0** và giao diện quản lý **phpMyAdmin**, tự động nạp toàn bộ cấu trúc bảng và dữ liệu mẫu:
+Dự án đã được đóng gói sẵn **Docker Compose** với **MySQL 8.0**, tự động nạp toàn bộ cấu trúc bảng và dữ liệu mẫu:
 
 #### Cách 1: Khởi động tự động bằng Docker (Khuyến nghị 🌟)
 Chạy một lệnh duy nhất:
@@ -95,8 +95,11 @@ npm run db:up
 # Hoặc chạy script trên Windows: .\docker-db.bat
 ```
 - **MySQL Server:** `localhost:3306` (User: `root`, Mật khẩu: `root`, Database: `badminton_shop`).
-- **phpMyAdmin Web GUI:** [`http://localhost:8085`](http://localhost:8085) (Đăng nhập tự động với user `root` / `root`).
-- Dữ liệu schema (`01_schema.sql`) và seed (`02_seed.sql`) tự động nạp sẵn vào database.
+- **Quản lý bằng HeidiSQL / DBeaver:**
+  - Network type: `MariaDB or MySQL (TCP/IP)`
+  - Hostname / IP: `127.0.0.1` (hoặc `localhost`)
+  - User: `root` | Password: `root` | Port: `3306` | Database: `badminton_shop`
+- Dữ liệu schema (`01_schema.sql`) và seed (`02_seed.sql`) tự động nạp sẵn vào database ngay lần chạy đầu tiên.
 - Lệnh dừng database: `npm run db:down` | Xem logs: `npm run db:logs` | Reset sạch: `.\docker-db.bat reset`.
 
 #### Cách 2: Sử dụng MySQL cục bộ (XAMPP / MySQL Server độc lập)

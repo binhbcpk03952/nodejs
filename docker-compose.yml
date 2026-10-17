@@ -25,23 +25,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # phpMyAdmin Web GUI Management (Truy cập: http://localhost:8085)
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: badminton_phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: badminton_db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
-      UPLOAD_LIMIT: 64M
-    ports:
-      - "8085:80"
-    depends_on:
-      badminton_db:
-        condition: service_healthy
-
 volumes:
   db_data:
     name: badminton_db_data
