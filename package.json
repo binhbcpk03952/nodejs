@@ -9,6 +9,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "test": "node sever/tests/auth_order_test.js",
+    "db:up": "wsl docker compose up -d",
+    "db:down": "wsl docker compose down",
+    "db:logs": "wsl docker compose logs -f badminton_db",
     "preview": "vite preview"
   },
   "dependencies": {

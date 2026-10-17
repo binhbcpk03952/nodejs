@@ -1,0 +1,47 @@
+services:
+  # MySQL Database Service
+  badminton_db:
+    image: mysql:8.0
+    container_name: badminton_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: badminton_shop
+      MYSQL_USER: root
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Tự động nạp schema và dữ liệu mẫu khi khởi động container lần đầu
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # phpMyAdmin Web GUI Management (Truy cập: http://localhost:8085)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: badminton_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: badminton_db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8085:80"
+    depends_on:
+      badminton_db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+    name: badminton_db_data

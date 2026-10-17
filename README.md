@@ -85,7 +85,22 @@ JWT_SECRET=your_super_secret_jwt_key_badminton_2026
 ```
 
 ### Bước 3: Khởi tạo Cơ sở dữ liệu (Database)
-Tạo database và nạp schema cùng seed data:
+
+Dự án đã được đóng gói sẵn **Docker Compose** bao gồm **MySQL 8.0** và giao diện quản lý **phpMyAdmin**, tự động nạp toàn bộ cấu trúc bảng và dữ liệu mẫu:
+
+#### Cách 1: Khởi động tự động bằng Docker (Khuyến nghị 🌟)
+Chạy một lệnh duy nhất:
+```bash
+npm run db:up
+# Hoặc chạy script trên Windows: .\docker-db.bat
+```
+- **MySQL Server:** `localhost:3306` (User: `root`, Mật khẩu: `root`, Database: `badminton_shop`).
+- **phpMyAdmin Web GUI:** [`http://localhost:8085`](http://localhost:8085) (Đăng nhập tự động với user `root` / `root`).
+- Dữ liệu schema (`01_schema.sql`) và seed (`02_seed.sql`) tự động nạp sẵn vào database.
+- Lệnh dừng database: `npm run db:down` | Xem logs: `npm run db:logs` | Reset sạch: `.\docker-db.bat reset`.
+
+#### Cách 2: Sử dụng MySQL cục bộ (XAMPP / MySQL Server độc lập)
+Nếu bạn đã có sẵn MySQL cục bộ:
 ```bash
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS badminton_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root -p badminton_shop < database/schema.sql
