@@ -7,9 +7,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: badminton_shop
-      MYSQL_USER: root
     ports:
-      - "${DB_PORT:-3306}:3306"
+      # Cổng 3308 ở máy chủ ánh xạ vào cổng 3306 của MySQL trong container
+      - "${DB_PORT:-3308}:3306"
     volumes:
       - db_data:/var/lib/mysql
       # Tự động nạp schema và dữ liệu mẫu khi khởi động container lần đầu

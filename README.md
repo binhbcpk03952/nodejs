@@ -94,11 +94,11 @@ Chạy một lệnh duy nhất:
 npm run db:up
 # Hoặc chạy script trên Windows: .\docker-db.bat
 ```
-- **MySQL Server:** `localhost:3306` (User: `root`, Mật khẩu: `root`, Database: `badminton_shop`).
+- **MySQL Server:** `localhost:3308` (User: `root`, Mật khẩu: `root`, Database: `badminton_shop`).
 - **Quản lý bằng HeidiSQL / DBeaver:**
   - Network type: `MariaDB or MySQL (TCP/IP)`
   - Hostname / IP: `127.0.0.1` (hoặc `localhost`)
-  - User: `root` | Password: `root` | Port: `3306` | Database: `badminton_shop`
+  - User: `root` | Password: `root` | Port: `3308` | Database: `badminton_shop`
 - Dữ liệu schema (`01_schema.sql`) và seed (`02_seed.sql`) tự động nạp sẵn vào database ngay lần chạy đầu tiên.
 - Lệnh dừng database: `npm run db:down` | Xem logs: `npm run db:logs` | Reset sạch: `.\docker-db.bat reset`.
 

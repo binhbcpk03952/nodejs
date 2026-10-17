@@ -9,17 +9,17 @@ if "%1"=="logs" goto logs
 if "%1"=="reset" goto reset
 
 :start
-echo [INFO] Dang khoi dong MySQL 8.0 bang Docker...
+echo [INFO] Dang khoi dong MySQL 8.0 bang Docker tren cong 3308...
 wsl docker compose up -d
 echo.
 echo ==============================================================
 echo [THANH CONG] Database Docker da san sang!
 echo - Hostname / IP:   127.0.0.1 (hoac localhost)
-echo - MySQL Port:      3306
+echo - MySQL Port:      3308
 echo - User:            root
 echo - Password:        root
 echo - Database Name:   badminton_shop
-echo - Ket noi truc tiep bang HeidiSQL hoan toan san sang!
+echo - Ket noi truc tiep bang HeidiSQL cong 3308 hoan toan san sang!
 echo ==============================================================
 goto end
 
