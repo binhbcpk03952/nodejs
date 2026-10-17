@@ -15,6 +15,10 @@ export default defineConfig({
         target: 'http://localhost:3030',
         changeOrigin: true,
       },
+      '/assets': {
+        target: 'http://localhost:3030',
+        changeOrigin: true,
+      },
       '/sever': {
         target: 'http://localhost:3030',
         changeOrigin: true,
