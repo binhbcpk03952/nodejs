@@ -10,6 +10,9 @@ CREATE DATABASE IF NOT EXISTS `badminton_shop`
 
 USE `badminton_shop`;
 
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- 1. BẢNG USERS (Tài khoản người dùng và quản trị viên)
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` INT AUTO_INCREMENT PRIMARY KEY,
