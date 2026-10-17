@@ -351,7 +351,8 @@ exports.addOrder = async (req, res) => {
     let serverSubtotal = 0;
     const validatedItems = [];
 
-    // 2. Duyệt qua từng sản phẩm, khóa dòng kiểm tra giá thật và tồn kho thật trong DB
+    // Gộp số lượng nếu payload gửi các dòng có cùng variant_id
+    const aggregatedMap = new Map();
     for (const item of items) {
       const vId = parseInt(item.variant_id, 10);
       const qty = parseInt(item.quantity, 10);
@@ -359,7 +360,11 @@ exports.addOrder = async (req, res) => {
       if (!vId || isNaN(qty) || qty <= 0) {
         throw new Error('Dữ liệu mặt hàng không hợp lệ');
       }
+      aggregatedMap.set(vId, (aggregatedMap.get(vId) || 0) + qty);
+    }
 
+    // 2. Duyệt qua từng sản phẩm (đã gộp), khóa dòng kiểm tra giá thật và tồn kho thật trong DB
+    for (const [vId, totalQty] of aggregatedMap.entries()) {
       // Khóa dòng biến thể để tránh oversell trong các request đồng thời
       const variantRows = await connWrapper.query(
         `SELECT pv.variant_id, pv.product_id, pv.stock, pv.price, p.name 
@@ -375,16 +380,16 @@ exports.addOrder = async (req, res) => {
       }
 
       const vData = variantRows[0];
-      if (vData.stock < qty) {
-        throw new Error(`Sản phẩm "${vData.name}" chỉ còn ${vData.stock} sản phẩm trong kho (bạn chọn ${qty})`);
+      if (vData.stock < totalQty) {
+        throw new Error(`Sản phẩm "${vData.name}" chỉ còn ${vData.stock} sản phẩm trong kho (tổng yêu cầu ${totalQty})`);
       }
 
       const verifiedPrice = Number(vData.price);
-      serverSubtotal += verifiedPrice * qty;
+      serverSubtotal += verifiedPrice * totalQty;
 
       validatedItems.push({
         variant_id: vId,
-        quantity: qty,
+        quantity: totalQty,
         price: verifiedPrice
       });
     }
@@ -458,11 +463,14 @@ exports.addOrder = async (req, res) => {
         [orderId, vItem.variant_id, vItem.quantity, vItem.price]
       );
 
-      // Trừ kho nguyên tử
-      await connWrapper.query(
-        'UPDATE product_variants SET stock = stock - ? WHERE variant_id = ?',
-        [vItem.quantity, vItem.variant_id]
+      // Trừ kho nguyên tử có điều kiện bảo vệ không âm
+      const updateRes = await connWrapper.query(
+        'UPDATE product_variants SET stock = stock - ? WHERE variant_id = ? AND stock >= ?',
+        [vItem.quantity, vItem.variant_id, vItem.quantity]
       );
+      if (updateRes.affectedRows === 0) {
+        throw new Error('Số lượng tồn kho không đủ để đáp ứng đơn hàng');
+      }
     }
 
     // 7. Xóa các sản phẩm trong giỏ hàng của chính user
@@ -554,12 +562,18 @@ exports.updateOrderStatus = async (req, res) => {
         throw new Error('Đơn hàng đã được xác nhận hoặc đang vận chuyển, không thể tự hủy');
       }
     } else {
-      // Admin: Kiểm tra ma trận chuyển đổi hợp lệ
-      if (currentStatus === 'completed') {
-        throw new Error('Đơn hàng đã hoàn tất thành công, không thể thay đổi trạng thái nữa');
-      }
-      if (currentStatus === 'cancelled') {
-        throw new Error('Đơn hàng đã bị hủy, không thể thay đổi trạng thái');
+      // Admin: Thi hành nghiêm ngặt ma trận chuyển đổi trạng thái hợp lệ
+      const VALID_TRANSITIONS = {
+        pending: ['confirmed', 'cancelled'],
+        confirmed: ['shipping', 'cancelled'],
+        shipping: ['completed', 'cancelled'],
+        completed: [],
+        cancelled: []
+      };
+
+      const allowed = VALID_TRANSITIONS[currentStatus] || [];
+      if (!allowed.includes(status)) {
+        throw new Error(`Không thể chuyển trạng thái từ "${currentStatus}" sang "${status}". Quy trình: Chờ xác nhận -> Đã xác nhận -> Đang giao -> Đã hoàn thành (hoặc Hủy)`);
       }
     }
 
@@ -619,7 +633,7 @@ exports.getDashboardStatistic = (req, res) => {
       MONTH(created_at) AS month,
       SUM(final_amount) AS total_revenue
     FROM orders
-    WHERE status = 'completed' OR payment_status = 'paid'
+    WHERE (status = 'completed' OR payment_status = 'paid')
       AND YEAR(created_at) = ?
     GROUP BY MONTH(created_at)
     ORDER BY MONTH(created_at)
@@ -634,7 +648,7 @@ exports.getDashboardStatistic = (req, res) => {
         payment_method,
         SUM(final_amount) AS total_revenue
       FROM orders
-      WHERE status = 'completed' OR payment_status = 'paid'
+      WHERE (status = 'completed' OR payment_status = 'paid')
         AND YEAR(created_at) = ?
       GROUP BY payment_method
     `;
